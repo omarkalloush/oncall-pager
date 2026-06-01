@@ -1,0 +1,32 @@
+[
+  {
+    "day": "Monday",
+    "start_time": "3:00 AM",
+    "end_time": "6:00 PM",
+    "email": "monday@example.com"
+  },
+  {
+    "day": "Tuesday",
+    "start_time": "3:00 AM",
+    "end_time": "6:00 PM",
+    "email": "tuesday@example.com"
+  },
+  {
+    "day": "Wednesday",
+    "start_time": "3:00 AM",
+    "end_time": "6:00 PM",
+    "email": "wednesday@example.com"
+  },
+  {
+    "day": "Thursday",
+    "start_time": "3:00 AM",
+    "end_time": "6:00 PM",
+    "email": "thursday@example.com"
+  },
+  {
+    "day": "Friday",
+    "start_time": "3:00 AM",
+    "end_time": "6:00 PM",
+    "email": "friday@example.com"
+  }
+]

@@ -1,25 +1,24 @@
 package schedule
 
 import (
-	"fmt"
-	"net/http"
-	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
 
 func TestGetOnCallEmail(t *testing.T) {
-	// Mock CSV data
-	csvData := `Day,Start Time,End Time,Email
-Monday,3:00 AM,6:00 PM,monday@example.com
-Friday,3:00 AM,6:00 PM,friday@example.com
-`
+	// Mock JSON data
+	jsonData := `[
+		{"day": "Monday", "start_time": "3:00 AM", "end_time": "6:00 PM", "email": "monday@example.com"},
+		{"day": "Friday", "start_time": "3:00 AM", "end_time": "6:00 PM", "email": "friday@example.com"}
+	]`
 
-	// Start a local HTTP server
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, csvData)
-	}))
-	defer server.Close()
+	tmpDir := t.TempDir()
+	filePath := filepath.Join(tmpDir, "schedule.json")
+	if err := os.WriteFile(filePath, []byte(jsonData), 0644); err != nil {
+		t.Fatalf("failed to write mock json: %v", err)
+	}
 
 	// Helper to create a fixed time in EST
 	mockTime := func(day time.Weekday, hour, minute int) func() time.Time {
@@ -63,7 +62,7 @@ Friday,3:00 AM,6:00 PM,friday@example.com
 			expectedError: "No one is on-call at the moment, we will reply to you as soon as possible!",
 		},
 		{
-			name:          "Failure - Tuesday (No slot in CSV)",
+			name:          "Failure - Tuesday (No slot in JSON)",
 			mockTime:      mockTime(time.Tuesday, 12, 0),
 			expectedEmail: "",
 			expectedError: "No one is on-call at the moment, we will reply to you as soon as possible!",
@@ -72,7 +71,7 @@ Friday,3:00 AM,6:00 PM,friday@example.com
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			provider := NewProvider(server.URL)
+			provider := NewProvider(filePath)
 			provider.TimeNow = tt.mockTime
 
 			email, err := provider.GetOnCallEmail()

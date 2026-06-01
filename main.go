@@ -18,18 +18,22 @@ func main() {
 
 	appToken := os.Getenv("SLACK_APP_TOKEN")
 	botToken := os.Getenv("SLACK_BOT_TOKEN")
-	sheetURL := os.Getenv("SHEET_URL")
+	scheduleFile := os.Getenv("SCHEDULE_FILE")
 	intakeChannel := os.Getenv("INTAKE_CHANNEL_NAME")
 
-	if appToken == "" || botToken == "" || sheetURL == "" {
-		log.Fatal("SLACK_APP_TOKEN, SLACK_BOT_TOKEN, and SHEET_URL must be set")
+	if scheduleFile == "" {
+		scheduleFile = "schedule.json"
+	}
+
+	if appToken == "" || botToken == "" {
+		log.Fatal("SLACK_APP_TOKEN and SLACK_BOT_TOKEN must be set")
 	}
 
 	if intakeChannel == "" {
 		intakeChannel = "intake" // Default to intake
 	}
 
-	schedProvider := schedule.NewProvider(sheetURL)
+	schedProvider := schedule.NewProvider(scheduleFile)
 
 	client, err := slackclient.NewClient(appToken, botToken, intakeChannel, schedProvider)
 	if err != nil {
